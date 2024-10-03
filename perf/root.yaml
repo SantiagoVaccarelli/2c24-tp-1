@@ -1,7 +1,7 @@
 config:
   environments:
     api:
-      target: 'http://localhost:5555/api'
+      target: 'http://localhost:8888/ping'
       plugins:
         statsd:
           host: localhost
@@ -14,7 +14,7 @@ config:
     - name: Ramp
       duration: 30
       arrivalRate: 1
-      rampTo: 5
+      rampTo: 20
     - name: Plain
       duration: 60
       arrivalRate: 5
