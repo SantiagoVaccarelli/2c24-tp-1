@@ -4,6 +4,12 @@ import rateLimit from 'express-rate-limit';
 
 const rateLimitingRouter = Router();
 
+const statsd = new StatsD({
+    host: 'graphite',
+    port: 8125,
+    prefix: 'endpoint.'
+});
+  
 const limiter = rateLimit({
     windowMs: 1000,
     max: 3,
@@ -19,9 +25,15 @@ rateLimitingRouter.get('/ping', (req, res) => {
 });
 
 rateLimitingRouter.get('/dictionary', async (req, res) => {
+    const startTotal = Date.now();
     const url = "https://api.dictionaryapi.dev/api/v2/entries/en/" + req.query.word;
     try {
+        const startAPI = Date.now();
         const response = await fetch(url);
+        const endAPI = Date.now();
+        
+        statsd.timing('api.response_time', endAPI - startAPI);
+        
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
@@ -37,13 +49,22 @@ rateLimitingRouter.get('/dictionary', async (req, res) => {
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Error fetching data');
+    } finally {
+        const endTotal = Date.now();
+        statsd.timing('api.total_response_time', endTotal - startTotal);
     }
 });
 
 rateLimitingRouter.get('/spaceflight_news', async (req, res) => {
+    const startTotal = Date.now();
     const url = "https://api.spaceflightnewsapi.net/v4/articles/?limit=5";
     try {
+        const startAPI = Date.now();
         const response = await fetch(url);
+        const endAPI = Date.now();
+        
+        statsd.timing('api.response_time', endAPI - startAPI);
+        
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
@@ -56,13 +77,22 @@ rateLimitingRouter.get('/spaceflight_news', async (req, res) => {
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Error fetching data');
+    } finally {
+        const endTotal = Date.now();
+        statsd.timing('api.total_response_time', endTotal - startTotal);
     }
 });
 
 rateLimitingRouter.get('/quote', async (req, res) => {
+    const startTotal = Date.now();
     const url = "https://uselessfacts.jsph.pl/api/v2/facts/random";
     try {
+        const startAPI = Date.now();
         const response = await fetch(url);
+        const endAPI = Date.now();
+        
+        statsd.timing('api.response_time', endAPI - startAPI);
+        
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
@@ -73,6 +103,9 @@ rateLimitingRouter.get('/quote', async (req, res) => {
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Error fetching data');
+    } finally {
+        const endTotal = Date.now();
+        statsd.timing('api.total_response_time', endTotal - startTotal);
     }
 });
 

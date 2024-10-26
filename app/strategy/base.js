@@ -1,8 +1,15 @@
 import fetch from 'node-fetch';
 import { Router } from 'express';
+import StatsD from 'hot-shots';
 
 
 const baseRouter = Router();
+
+const statsd = new StatsD({
+    host: 'graphite',
+    port: 8125,
+    prefix: 'endpoint.'
+});
 
 baseRouter.get('/ping', (req, res) => {
     console.log('ping base')
@@ -10,11 +17,17 @@ baseRouter.get('/ping', (req, res) => {
   })
 
 baseRouter.get('/dictionary', async (req, res) => {
+    const startTotal = Date.now();
     const url = "https://api.dictionaryapi.dev/api/v2/entries/en/" + req.query.word;
     try {
+        const startAPI = Date.now();
         const response = await fetch(url);
+        const endAPI = Date.now();
+        
+        statsd.timing('api.response_time', endAPI - startAPI);
+        
         if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`);
+            throw new Error(`Response status: ${response.status}`);
         }
 
         const json = await response.json();
@@ -27,13 +40,22 @@ baseRouter.get('/dictionary', async (req, res) => {
         res.send(word)
     } catch (error) {
         console.error(error.message);
+    } finally {
+        const endTotal = Date.now();
+        statsd.timing('api.total_response_time', endTotal - startTotal);
     }
 })
 
 baseRouter.get('/spaceflight_news', async (req, res) => {
+    const startTotal = Date.now();
     const url = "https://api.spaceflightnewsapi.net/v4/articles/?limit=5";
     try {
+        const startAPI = Date.now();
         const response = await fetch(url);
+        const endAPI = Date.now();
+        
+        statsd.timing('api.response_time', endAPI - startAPI);
+        
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
@@ -45,15 +67,24 @@ baseRouter.get('/spaceflight_news', async (req, res) => {
         res.send(titles)
     } catch (error) {
         console.error(error.message);
+    } finally {
+        const endTotal = Date.now();
+        statsd.timing('api.total_response_time', endTotal - startTotal);
     }
 })
 
 baseRouter.get('/quote', async (req, res) => {
+    const startTotal = Date.now();
     const url = "https://uselessfacts.jsph.pl/api/v2/facts/random";
     try {
+        const startAPI = Date.now();
         const response = await fetch(url);
+        const endAPI = Date.now();
+        
+        statsd.timing('api.response_time', endAPI - startAPI);
+        
         if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`);
+            throw new Error(`Response status: ${response.status}`);
         }
 
         const json = await response.json();
@@ -61,6 +92,9 @@ baseRouter.get('/quote', async (req, res) => {
         res.send(json)
     } catch (error) {
         console.error(error.message);
+    } finally {
+        const endTotal = Date.now();
+        statsd.timing('api.total_response_time', endTotal - startTotal);
     }
 })
 
