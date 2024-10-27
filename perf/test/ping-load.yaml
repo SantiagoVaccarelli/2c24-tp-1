@@ -35,9 +35,16 @@ config:
 
   phases:
     - name: Ramp
-      duration: 30
+      duration: 60
       arrivalRate: 1
       rampTo: 50
+    - name: Sustain Load
+      duration: 60
+      arrivalRate: 50
+    - name: Ramp Down
+      duration: 60
+      arrivalRate: 50
+      rampTo: 1
 
 
 scenarios:

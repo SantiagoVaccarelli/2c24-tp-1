@@ -41,13 +41,13 @@ config:
 
   phases:
     - name: start
-      duration: 10
+      duration: 60
       arrivalRate: 3
     - name: spike
-      duration: 5
+      duration: 15
       arrivalRate: 30
     - name: end
-      duration: 10
+      duration: 60
       arrivalRate: 3
 
 
