@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import { Router } from 'express';
 import { createClient } from 'redis';
+import StatsD from 'hot-shots';
 
 const cacheRouter = Router();
 

@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
+import StatsD from 'hot-shots';
 
 const rateLimitingRouter = Router();
 
